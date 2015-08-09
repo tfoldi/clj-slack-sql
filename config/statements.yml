@@ -1,0 +1,31 @@
+# Example configuration
+
+# If your database library is thread safe you can enable
+# parallel execution of SQLs per database connections
+multithread: yes
+# Poll interall in seconds
+poll_interval: 100
+
+# token can be specified by SLACK_TOKEN environment variable
+slack:
+  # slack web api token, you can get one from here: https://api.slack.com/web
+  token: <foo>
+  # bot's name. Can be anything
+  username: csicska
+
+statements:
+  - name: db1_example
+    classname: org.h2.Driver
+    url: jdbc:h2:mem:test_mem
+    user: sa
+    password: ""
+    statements:
+    - name: example1
+      channel: "#foo"
+      type: simple
+      query: SELECT 1
+    - name: example1
+      type: simple
+      channel: "#bar"
+      query: SELECT 1 WHERE 1 = 0
+
