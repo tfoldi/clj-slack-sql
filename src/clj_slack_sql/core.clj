@@ -2,9 +2,9 @@
 (ns clj-slack-sql.core
   (:require [clojure.tools.logging :as log])
   (:require [clj-slack-sql.db :as db])
-  (:require [clojure.java.jdbc :as jdbc]) ; TODO: remove me
   (:require [clojure.tools.cli :refer [parse-opts]])
   (:require [clj-slack-sql.config :as config])
+  (:require [clj-slack-sql.slack :as slack])
   (:gen-class))
 
 
@@ -36,6 +36,7 @@
           config (config/parse-config-file
                    (get-in opts [:options :config]))
           db-map (db/create-connection-pool-map config)
+          slack-connection (slack/get-connection config)
           sleep-time (* 1000
                          (or (get config :poll_interval)
                              10))]
@@ -48,8 +49,9 @@
              cycle_counter 1]
 
         (log/info "Starting cycle " cycle_counter)
-        (log/info
-          (db/execute-queries config db-map))
+        (doall
+          (slack/post-message slack-connection
+            (db/execute-queries config db-map)))
 
 
         (log/info "Cycle finished, sleeping " (/ sleep-time 1000) " seconds... ")

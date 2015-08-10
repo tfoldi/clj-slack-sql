@@ -31,18 +31,22 @@
     ; for each database we will call
     (mymap (fn [statement_node]
              (log/debug " db-info " db-info " statement " statement_node)
-             (try
-               {:results
-                (jdbc/query db-info (get statement_node :query))}
-               ; Bad luck, save the exception
-               (catch Exception ex
-                 {:error  (.getMessage ex)})))
+             (merge {:dbname (get dbnode :name)}
+                    ; location and configuration information
+                    (select-keys statement_node [:group :channel :name :type])
+                    ; add eighter :results with map of SQL return or :error with error information
+                    (try
+                      {:results
+                       (jdbc/query db-info (get statement_node :query))}
+                      ; Bad luck, save the exception
+                      (catch Exception ex
+                        {:error (.getMessage ex)}))))
            (get dbnode :statements))))
 
 (defn execute-queries
   "Execute queries in all databases in-parallel"
   [config db-map]
-  (pmap
-    (fn [dbnode]
-      (execute-queries-for-database config dbnode (get db-map (get dbnode :name))))
-    (get config :databases)))
+    (pmap
+      (fn [dbnode]
+        (execute-queries-for-database config dbnode (get db-map (get dbnode :name))))
+      (get config :databases)))
