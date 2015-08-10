@@ -1,4 +1,5 @@
 (ns clj-slack-sql.config
+  (:require [clojure.tools.logging :as log])
   (:require [clj-yaml.core :as yaml]))
 
 ; throw exception in any case of issues

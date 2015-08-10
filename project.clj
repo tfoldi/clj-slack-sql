@@ -6,6 +6,8 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.julienxx/clj-slack "0.4.3"]
                  [org.clojure/tools.logging "0.3.1"]
+                 [org.clojure/tools.cli "0.3.2"]
+                 [clojure.jdbc/clojure.jdbc-c3p0 "0.3.2"]
                  [org.clojure/java.jdbc "0.4.1"]
                  [clj-yaml  "0.4.0"]
                  [log4j/log4j "1.2.17" :exclusions [javax.mail/mail

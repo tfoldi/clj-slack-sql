@@ -2,9 +2,9 @@
 
 # If your database library is thread safe you can enable
 # parallel execution of SQLs per database connections
-multithread: yes
+multithread: no
 # Poll interall in seconds
-poll_interval: 100
+poll_interval: 10
 
 # token can be specified by SLACK_TOKEN environment variable
 slack:
@@ -13,15 +13,14 @@ slack:
   # bot's name. Can be anything
   username: csicska
 
-statements:
+databases:
   - name: db1_example
-    classname: org.h2.Driver
-    url: jdbc:h2:mem:test_mem
+    connection-uri: jdbc:h2:mem:test_mem
     user: sa
     password: ""
     statements:
     - name: example1
-      channel: "#foo"
+      group: "foo"
       type: simple
       query: SELECT 1
     - name: example1
