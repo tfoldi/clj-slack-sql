@@ -20,11 +20,24 @@ databases:
     password: ""
     statements:
     - name: example1
-      group: "#foo"
+      channel: "#test"
       type: simple
       query: SELECT 1
-    - name: example1
+    - name: example2
       type: simple
-      channel: "#bar"
-      query: SELECT 1 WHERE 1 = 0
+      channel: "#test"
+      query: SELECT 1 WHERE 1 = # bad query
+    - name: example4
+      type: simple
+      channel: "#test"
+      query: SELECT 1 col union all select 2 col
+  - name: db2_example
+    connection-uri: jdbc:h2:mem:test_mem2
+    user: sa
+    password: ""
+    statements:
+    - name: example3
+      channel: "#test"
+      type: simple
+      query: SELECT '%WINDOW_START_DATETIME%' as start, '%WINDOW_END_DATETIME%' as end
 

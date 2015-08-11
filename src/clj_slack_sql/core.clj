@@ -54,7 +54,7 @@
         (log/info "Starting cycle " cycle_counter)
 
         (doall
-          (slack/post-message slack-connection
+          (slack/post-messages slack-connection
             (db/execute-queries config db-map [prev_cycle_start current_cycle_start])))
 
         (log/info "Cycle finished, sleeping " (/ sleep-time 1000) " seconds... ")
