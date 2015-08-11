@@ -2,8 +2,17 @@
 
 This app does exactly what you need: post periodically executed SQL queries' output to slack channels. It can connect
 to multiple databases (in parallel) executing set of queries using configurable `c3p0` connection pooling also in parallel.
-Additionally you can retrieve the current and previous execution cycle's timestamp allowing to construct complex SQL queries
+Additionally you can retrieve the current and previous execution cycles' timestamps allowing to construct complex SQL queries
 looking for only recent entries in source tables.
+
+Typically, things like:
+
+```sql
+SELECT last_error_message "Error" 
+  FROM app_logs 
+ WHERE last_update_date >= '%WINDOW_START_DATE%' 
+   AND last_update_date < '%WINDOW_END_DATE%'`
+```
  
 The application is written in clojure but the compiled jar file can run everywhere without any dependency other than the
 JVM itself. Linux, Mac, Windows + other unixes are all supported.
@@ -12,7 +21,7 @@ JVM itself. Linux, Mac, Windows + other unixes are all supported.
 
 You can find the latest releases in [Github releases.](https://github.com/tfoldi/clj-slack-sql/releases)
 
-Additionally you can download the sources and build for yourself. It requires only [Leiningen|leiningen.org].
+Additionally you can download the sources and build for yourself. It requires only [Leiningen](leiningen.org).
 
     $ git clone https://github.com/tfoldi/clj-slack-sql.git
     $ cd clj-slack-sql
