@@ -2,7 +2,7 @@
 
 # If your database library is thread safe you can enable
 # parallel execution of SQLs per database connections
-multithread: no
+multithread: yes
 # Poll interall in seconds
 poll_interval: 10
 
@@ -36,10 +36,9 @@ databases:
     user: sa
     password: ""
     statements:
-    - name: using
+    - name: using window functions and multiline query definition
       channel: "#test"
       type: simple
-      # multi line queries can be added with > or | signs
       query: |
         SELECT '%WINDOW_START_DATETIME%' as "Cycle Started at"
              , '%WINDOW_END_DATETIME%' as "Cycle Ended at"
