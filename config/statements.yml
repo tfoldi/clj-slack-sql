@@ -20,7 +20,7 @@ databases:
     password: ""
     statements:
     - name: example1
-      group: "foo"
+      group: "#foo"
       type: simple
       query: SELECT 1
     - name: example1

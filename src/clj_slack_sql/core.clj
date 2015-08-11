@@ -44,20 +44,23 @@
       (log/debug "opts & config: " opts config)
 
       (log/info "Starting up Application's main loop")
+      ; loop forever. During every cycle we will update the `prev_cycle_start`
+      ; and `current_cycle_start` values. In the first cycle these values are
+      ; equal.
       (loop [prev_cycle_start (System/currentTimeMillis)
-             current_cycle_start (System/currentTimeMillis)
+             current_cycle_start prev_cycle_start
              cycle_counter 1]
 
         (log/info "Starting cycle " cycle_counter)
+
         (doall
           (slack/post-message slack-connection
-            (db/execute-queries config db-map)))
-
+            (db/execute-queries config db-map [prev_cycle_start current_cycle_start])))
 
         (log/info "Cycle finished, sleeping " (/ sleep-time 1000) " seconds... ")
         (Thread/sleep sleep-time)
 
-        ; wake up, neo
+        ; After waiting sleep time we can proceed with the next cycle.
         (recur current_cycle_start (System/currentTimeMillis) (inc cycle_counter))))
 
     (catch Exception ex
