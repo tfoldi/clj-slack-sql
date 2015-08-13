@@ -25,25 +25,33 @@
                                                        x)))
                               ) result)))
 
+(defn- format-message
+  "Format slack notification message"
+  [statement-res]
+  (apply str
+         "*" (get statement-res :dbname) "*: "
+         (get statement-res :name)
+         \newline ">>>"                                     ; TODO: colorize blockquote sign
+         (if (get statement-res :error)
+           (str
+             "ERROR: when executing query:"
+             (get statement-res :error))
+           (format-sql-result (get statement-res :results)))))
+
 (defn- post-message-for-one-database
   "Post results for one database to its predefined slack channels"
   [slack-connection db-results]
   (log/info "Posting result" db-results)
   (doall
     (map (fn [statement-res]
-           (log/info "Posting statement result" statement-res)
+           ; post only if we have results or an error message
+           (if (or (get statement-res :error) (not-empty (get statement-res :results)))
+             (log/info "Posting statement result" statement-res)
 
-           (chat/post-message slack-connection (get statement-res :channel)
-                              (apply str
-                                     "*" (get statement-res :dbname) "*: "
-                                     (get statement-res :name)
-                                     \newline ">>>" ; TODO: colorize block quote sign
-                                     (if (get statement-res :error)
-                                       (str
-                                         "ERROR: when executing query:"
-                                         (get statement-res :error))
-                                       (format-sql-result (get statement-res :results))))
-                              {:username (get slack-connection :username)}))
+             (chat/post-message slack-connection
+                                (get statement-res :channel)
+                                (format-message statement-res)
+                                {:username (get slack-connection :username)})))
          db-results)))
 
 
