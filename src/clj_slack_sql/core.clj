@@ -28,6 +28,12 @@
                     {:errors (get options :errors)})))
   options)
 
+
+(defn- sleep
+  "Sleep at least 0 seconds, ideally sleep-time minus current the cycle's duration"
+  [cycle-start sleep-time]
+  (Thread/sleep (max (sleep-time (- (System/currentTimeMillis) cycle-start ) sleep-time) 0 ))
+
 (defn -main
   "TODO: doc"
   [& args]
@@ -47,21 +53,21 @@
       ; loop forever. During every cycle we will update the `prev_cycle_start`
       ; and `current_cycle_start` values. In the first cycle these values are
       ; equal.
-      (loop [prev_cycle_start (System/currentTimeMillis)
-             current_cycle_start prev_cycle_start
-             cycle_counter 1]
+      (loop [prev-cycle-start (- (System/currentTimeMillis) sleep-time)
+             current-cycle-start (System/currentTimeMillis)
+             cycle-counter 1]
 
-        (log/info "Starting cycle " cycle_counter)
+        (log/info "Starting cycle " cycle-counter)
 
         (doall
           (slack/post-messages slack-connection
-            (db/execute-queries config db-map [prev_cycle_start current_cycle_start])))
+            (db/execute-queries config db-map [prev-cycle-start current-cycle-start])))
 
-        (log/info "Cycle finished, sleeping " (/ sleep-time 1000) " seconds... ")
-        (Thread/sleep sleep-time)
+        (log/info "Cycle finished, sleeping")
+        (sleep current-cycle-start sleep-time)
 
         ; After waiting sleep time we can proceed with the next cycle.
-        (recur current_cycle_start (System/currentTimeMillis) (inc cycle_counter))))
+        (recur current-cycle-start (System/currentTimeMillis) (inc cycle-counter))))
 
     (catch Exception ex
       ; TODO: please format meeeee

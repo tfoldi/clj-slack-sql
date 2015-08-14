@@ -41,17 +41,19 @@
 (defn- post-message-for-one-database
   "Post results for one database to its predefined slack channels"
   [slack-connection db-results]
-  (log/info "Posting result" db-results)
+  (log/debug "Posting result" db-results)
   (doall
     (map (fn [statement-res]
            ; post only if we have results or an error message
            (if (or (get statement-res :error) (not-empty (get statement-res :results)))
-             (log/info "Posting statement result" statement-res)
+             (log/info "Posting statement result: " statement-res)
 
-             (chat/post-message slack-connection
-                                (get statement-res :channel)
-                                (format-message statement-res)
-                                {:username (get slack-connection :username)})))
+             (try
+               (chat/post-message slack-connection
+                                  (get statement-res :channel)
+                                  (format-message statement-res)
+                                  {:username (get slack-connection :username)})
+               (catch Exception ex (log/error ex)))))
          db-results)))
 
 
