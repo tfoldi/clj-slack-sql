@@ -40,7 +40,7 @@ configuration](https://github.com/tfoldi/clj-slack-sql/blob/master/config/statem
 In the generic section you can have to set two generic options:
 
  * `multithread`: controlls if queries for one data source are executed in parallel or sequential. `clj-slack-sql`
- uses database thread pools and the majority of jdbc drivers are thread safe, thus, in most of the cases you can safely
+ uses database connection pools and the majority of jdbc drivers are thread safe, thus, in most of the cases you can safely
  say `yes`. However, if you don't want to stress your database system just set the value to `no`. 
  * `poll_interval`: defines the time required between two cycles
 
