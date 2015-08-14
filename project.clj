@@ -1,4 +1,4 @@
-(defproject clj-slack-sql "0.1.0"
+(defproject clj-slack-sql "0.1.1-SNAPSHOT"
   :description "Post SQL Statements results to slack channels"
   :url "https://github.com/tfoldi/clj-slack-sql"
   :license {:name "Eclipse Public License"
