@@ -44,8 +44,7 @@
   (log/debug "Posting result" db-results)
   (doall
     (map (fn [statement-res]
-           ; post only if we have results or an error message
-           (if (or (get statement-res :error) (not-empty (get statement-res :results)))
+           (when (or (get statement-res :error) (not-empty (get statement-res :results)))
              (log/info "Posting statement result: " statement-res)
 
              (try
@@ -53,7 +52,7 @@
                                   (get statement-res :channel)
                                   (format-message statement-res)
                                   {:username (get slack-connection :username)})
-               (catch Exception ex (log/error ex)))))
+               (catch Exception ex (log/error "post-message-for-one-database" ex)))))
          db-results)))
 
 

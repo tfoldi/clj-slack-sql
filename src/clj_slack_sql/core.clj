@@ -18,9 +18,9 @@
   [["-c" "--config FILE" "Config file for Slack SQL"
     :default config-file
     :validate [#(.exists (clojure.java.io/as-file %)) "Config file does not exists"]]
-   ["-n" "--num-cycles PORT" "Number of cycles to perform"
-     :default nil
-     :parse-fn #(Integer/parseInt %)]
+   ["-n" "--num-cycles NUMBER" "Number of cycles to perform"
+    :default nil
+    :parse-fn #(Integer/parseInt %)]
    ; Show show to help `-h` or `--help
    ["-h" "--help"]])
 
@@ -35,7 +35,7 @@
 (defn- sleep
   "Sleep at least 0 seconds, ideally sleep-time minus current the cycle's duration"
   [cycle-start sleep-time]
-  (Thread/sleep (max (sleep-time (- (System/currentTimeMillis) cycle-start ) sleep-time) 0 )))
+  (Thread/sleep (max (- sleep-time (- (System/currentTimeMillis) cycle-start)) 0)))
 
 (defn -main
   "TODO: doc"
@@ -44,11 +44,12 @@
     (let [opts (validate-opts (parse-opts args cli-options))
           config (config/parse-config-file
                    (get-in opts [:options :config]))
+          num-cycles (get-in opts [:options :num-cycles])
           db-map (db/create-connection-pool-map config)
           slack-connection (slack/get-connection config)
           sleep-time (* 1000
-                         (or (get config :poll_interval)
-                             10))]
+                        (or (get config :poll_interval)
+                            10))]
 
       (log/debug "opts & config: " opts config)
 
@@ -64,13 +65,15 @@
 
         (doall
           (slack/post-messages slack-connection
-            (db/execute-queries config db-map [prev-cycle-start current-cycle-start])))
+                               (db/execute-queries config db-map [prev-cycle-start current-cycle-start])))
 
         (log/info "Cycle finished, sleeping")
         (sleep current-cycle-start sleep-time)
 
         ; After waiting sleep time we can proceed with the next cycle.
-        (recur current-cycle-start (System/currentTimeMillis) (inc cycle-counter))))
+        ; if max cycle is defined then stop when necessary
+        (when (or (not num-cycles) (> num-cycles cycle-counter))
+          (recur current-cycle-start (System/currentTimeMillis) (inc cycle-counter)))))
 
     (catch Exception ex
       ; TODO: please format meeeee
