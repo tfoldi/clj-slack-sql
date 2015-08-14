@@ -18,6 +18,9 @@
   [["-c" "--config FILE" "Config file for Slack SQL"
     :default config-file
     :validate [#(.exists (clojure.java.io/as-file %)) "Config file does not exists"]]
+   ["-n" "--num-cycles PORT" "Number of cycles to perform"
+     :default nil
+     :parse-fn #(Integer/parseInt %)]
    ; Show show to help `-h` or `--help
    ["-h" "--help"]])
 
@@ -32,7 +35,7 @@
 (defn- sleep
   "Sleep at least 0 seconds, ideally sleep-time minus current the cycle's duration"
   [cycle-start sleep-time]
-  (Thread/sleep (max (sleep-time (- (System/currentTimeMillis) cycle-start ) sleep-time) 0 ))
+  (Thread/sleep (max (sleep-time (- (System/currentTimeMillis) cycle-start ) sleep-time) 0 )))
 
 (defn -main
   "TODO: doc"
