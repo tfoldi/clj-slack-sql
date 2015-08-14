@@ -1,0 +1,31 @@
+# Example configuration for monitoring failed tableau extracts
+
+# If your database library is thread safe you can enable
+# parallel execution of SQLs per database connections
+multithread: yes
+# Poll interall in seconds
+poll_interval: 300
+
+# token can be specified by SLACK_TOKEN environment variable
+slack:
+  # slack web api token, you can get one from here: https://api.slack.com/web
+  token: ADDME
+  # bot's name. Can be anything
+  username: tableau_bot
+
+databases:
+  - name: Tableau production
+    connection-uri: "jdbc:postgresql://tableau_server:8060/workgroup"
+    user: readonly
+    password: "supersecret"
+    statements:
+    - name: Failed extracts
+      channel: "#tableau_monitoring"
+      type: simple
+      query: |
+        SELECT title,notes FROM _background_tasks
+        WHERE finish_code ='1'
+        AND job_type LIKE '%--- :refresh_extracts%'
+        and completed_at >= '%WINDOW_START_DATETIME%'
+        and completed_at < '%WINDOW_END_DATETIME%'
+  
