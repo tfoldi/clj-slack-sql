@@ -56,6 +56,6 @@
          db-results)))
 
 
-(defn post-message
+(defn post-messages
   [slack-connection results]
   (map #(post-message-for-one-database slack-connection %) results))
